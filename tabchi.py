@@ -13,9 +13,6 @@ else:
         'api_id': api_id,
         'api_hash': api_hash,
         'phone_number': phone,
-        'app_version': '5.0.3',
-        'device_model': 'Samsung Galaxy S8',
-        'system_version': ''
     }
     gplog = input("Please Input Group Log : ")
     sudo = input("Please Input Sudo Users : ")
