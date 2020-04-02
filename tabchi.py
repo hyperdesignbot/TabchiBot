@@ -153,13 +153,22 @@ def autofwd():
 def joining(join_link):
     power = db.get("data:power")
     if power == 'off':
-        app.join_chat(join_link)
+        try:
+            app.join_chat(join_link)
+        except FloodWait as e:
+            sndgplog(f"Bot Has Been ShutDown For {e.x} Seconds")
+            sleep(e.x)
+
     elif power == 'on':
         count_members = app.get_chat(join_link)["members_count"]
         max_mem = db.get("data:max_gp_member")
         min_mem = db.get("data:min_gp_member")
         if int(min_mem) <= count_members <= int(max_mem):
-            app.join_chat(join_link)
+            try:
+                app.join_chat(join_link)
+            except FloodWait as e:
+                sndgplog(f"Bot Has Been ShutDown For {e.x} Seconds")
+                sleep(e.x)
         else:
             sndgplog("تعداد اعضای گروه خارج از تعداد تعیین شده است.\n گروه:%s  \n تعداد اعضا: %s"%(join_link,count_members))
 
