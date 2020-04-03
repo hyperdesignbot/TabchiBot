@@ -122,7 +122,7 @@ def autopost():
     baner_text = db.get("data:banertxt")
     for gpid in gp_ids:
         m = random.randrange(120)
-        sndgplog("sleep %s second in forward msg" % m)
+        sndgplog("sleep %s second in post msg" % m)
         sleep(m)
         try:
             app.send_message(int(gpid), baner_text)
