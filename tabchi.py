@@ -8,6 +8,7 @@ from pyrogram.errors import (
     BadRequest, Flood, InternalServerError,
     SeeOther, Unauthorized, UnknownError, FloodWait
 )
+import schedule
 config = ConfigParser()
 if path.isfile("./config.ini"):
     config.read("config.ini")
@@ -197,5 +198,9 @@ def group_received(client,m):
                 e = 'joinchat %s'%str(e)
                 sndgplog(str(e))
 
-
-
+def job():
+    print("I'm working...")
+schedule.every(10).minutes.do(job)
+while 1:
+    schedule.run_pending()
+    sleep(1)
