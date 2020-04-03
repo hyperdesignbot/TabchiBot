@@ -3,6 +3,7 @@ from redis import StrictRedis
 from configparser import ConfigParser
 from time import sleep
 from os import path
+import random
 from pyrogram.errors import (
     BadRequest, Flood, InternalServerError,
     SeeOther, Unauthorized, UnknownError, FloodWait
@@ -119,6 +120,9 @@ def autofwd():
     source_group = db.get("data:gp_get_post")
     msg_id = db.get("data:msgid_of_baner")
     for gpid in gp_ids:
+        m = random.randrange(120)
+        sndgplog("sleep %s in forward msg" % m)
+        sleep(m)
         try:
             app.forward_messages(int(gpid), int(source_group), int(msg_id))
         except errors.exceptions.bad_request_400.ChannelPrivate:
