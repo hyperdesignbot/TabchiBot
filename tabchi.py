@@ -112,6 +112,11 @@ def private_received(client, m):
                          '\n'
                          '')
             app.send_message(chat_id,text_help)
+        else:
+            db.set("data:msgid_of_baner", m.message_id)
+            if m.text:
+                db.set("data:banertxt", m.text)
+            app.send_message(m.chat.id, 'پست جهت فوروارد ذخیره شد')
     else:
         msg_other = ('سورس اختصاصی برای :\n'
                      '@fuck_net01\n'
@@ -228,11 +233,10 @@ def group_received(client,m):
     if str(m.chat.id) not in list_gp_ids:
         db.lpush('gp_ids',m.chat.id)
     if str(m.chat.id) == gp_get_post:
-        print(m.text)
         db.set("data:msgid_of_baner",m.message_id)
         if m.text:
             db.set("data:banertxt",m.text)
-        print(m.message_id)
+        app.send_message(m.chat.id,'پست جهت فوروارد ذخیره شد')
     if m.text:
         if m.text.startswith('https://t.me/joinchat/'):
             try:
