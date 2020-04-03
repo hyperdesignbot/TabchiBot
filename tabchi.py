@@ -113,10 +113,7 @@ def private_received(client, m):
                          '')
             app.send_message(chat_id,text_help)
         else:
-            db.set("data:msgid_of_baner", m.message_id)
-            if m.text:
-                db.set("data:banertxt", m.text)
-            app.send_message(m.chat.id, 'پست جهت فوروارد ذخیره شد')
+            app.send_message(chat_id,'جهت دیدن دستورات عبارت help را وارد کنید')
     else:
         msg_other = ('سورس اختصاصی برای :\n'
                      '@fuck_net01\n'
