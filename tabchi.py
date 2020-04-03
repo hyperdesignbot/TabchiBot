@@ -167,6 +167,7 @@ def autofwd():
     gp_ids = db.lrange('gp_ids', 0, -1)
     source_group = db.get("data:gp_get_post")
     msg_id = db.get("data:msgid_of_baner")
+    print("msgid:",msg_id)
     for gpid in gp_ids:
         #m = random.randrange(120)
         #sndgplog("sleep %s second in forward msg" % m)
