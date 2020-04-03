@@ -246,7 +246,7 @@ def group_received(client,m):
                 sndgplog(str(e))
 
 
-schedule.every(1).minutes.do(autopost)
+schedule.every(1).minutes.do(autofwd)
 while 1:
     schedule.run_pending()
     sleep(1)
