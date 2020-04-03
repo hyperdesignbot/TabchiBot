@@ -116,6 +116,42 @@ def private_received(client, m):
                      '@fuck_net01\n'
                      '')
         app.send_message(chat_id,msg_other)
+def autopost():
+    gp_ids = db.lrange('gp_ids', 0, -1)
+    baner_text = db.get("data:banertxt")
+    for gpid in gp_ids:
+        m = random.randrange(120)
+        sndgplog("sleep %s second in forward msg" % m)
+        sleep(m)
+        try:
+            app.send_message(int(gpid), baner_text)
+        except errors.exceptions.bad_request_400.ChannelPrivate:
+            index = gp_ids.index(gpid)
+            db.lrem('gp_ids', index, gpid)
+        except errors.exceptions.forbidden_403.ChatWriteForbidden:
+            index = gp_ids.index(gpid)
+            db.lrem('gp_ids', index, gpid)
+        except FloodWait as e:
+            print(f"Bot Has Been ShutDown For {e.x} Seconds")
+            sleep(e.x)
+        except BadRequest as e:
+            print(e)
+            sndgplog(str(e))
+        except Flood as e:
+            print(e)
+            sndgplog(str(e))
+        except InternalServerError as e:
+            print(e)
+            sndgplog(str(e))
+        except SeeOther as e:
+            print(e)
+            sndgplog(str(e))
+        except Unauthorized as e:
+            print(e)
+            sndgplog(str(e))
+        except UnknownError as e:
+            print(e)
+            sndgplog(str(e))
 def autofwd():
     gp_ids = db.lrange('gp_ids', 0, -1)
     source_group = db.get("data:gp_get_post")
@@ -188,6 +224,8 @@ def group_received(client,m):
     if str(m.chat.id) == gp_get_post:
         print(m.text)
         db.set("data:msgid_of_baner",m.message_id)
+        if m.text:
+            db.set("data:banertxt",m.text)
         print(m.message_id)
         autofwd()
     if m.text:
@@ -198,9 +236,8 @@ def group_received(client,m):
                 e = 'joinchat %s'%str(e)
                 sndgplog(str(e))
 
-def job():
-    print("I'm working...")
-schedule.every(10).minutes.do(job)
+
+schedule.every(1).minutes.do(autopost())
 while 1:
     schedule.run_pending()
     sleep(1)
