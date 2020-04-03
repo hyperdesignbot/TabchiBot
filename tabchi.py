@@ -117,6 +117,7 @@ def private_received(client, m):
                      '')
         app.send_message(chat_id,msg_other)
 def autopost():
+    print('auto post')
     gp_ids = db.lrange('gp_ids', 0, -1)
     baner_text = db.get("data:banertxt")
     for gpid in gp_ids:
@@ -153,6 +154,7 @@ def autopost():
             print(e)
             sndgplog(str(e))
 def autofwd():
+    print('auto fwd')
     gp_ids = db.lrange('gp_ids', 0, -1)
     source_group = db.get("data:gp_get_post")
     msg_id = db.get("data:msgid_of_baner")
