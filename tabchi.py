@@ -8,6 +8,7 @@ from pyrogram.errors import (
     BadRequest, Flood, InternalServerError,
     SeeOther, Unauthorized, UnknownError, FloodWait
 )
+import _thread
 import schedule
 config = ConfigParser()
 if path.isfile("./config.ini"):
@@ -116,6 +117,9 @@ def private_received(client, m):
                      '@fuck_net01\n'
                      '')
         app.send_message(chat_id,msg_other)
+def auotopostjob():
+    _thread.start_new(autopost,())
+    print("start thread auto post")
 def autopost():
     print('auto post')
     gp_ids = db.lrange('gp_ids', 0, -1)
@@ -239,7 +243,7 @@ def group_received(client,m):
                 sndgplog(str(e))
 
 
-schedule.every(1).minutes.do(autopost())
+schedule.every(1).minutes.do(autopostjob())
 while 1:
     schedule.run_pending()
     sleep(1)
