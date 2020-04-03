@@ -119,11 +119,8 @@ def private_received(client, m):
                      '@fuck_net01\n'
                      '')
         app.send_message(chat_id,msg_other)
-def auotopostjob():
-    _thread.start_new(autopost,())
-    print("start thread auto post")
+
 def autopost():
-    print('auto post')
     gp_ids = db.lrange('gp_ids', 0, -1)
     baner_text = db.get("data:banertxt")
     for gpid in gp_ids:
@@ -160,11 +157,9 @@ def autopost():
             print(e)
             sndgplog(str(e))
 def autofwd():
-    print('auto fwd2')
     gp_ids = db.lrange('gp_ids', 0, -1)
     source_group = db.get("data:gp_get_post")
     msg_id = db.get("data:msgid_of_baner")
-    print("msgid:",msg_id)
     for gpid in gp_ids:
         #m = random.randrange(120)
         #sndgplog("sleep %s second in forward msg" % m)
@@ -244,7 +239,7 @@ def group_received(client,m):
                 sndgplog(str(e))
 
 
-schedule.every(1).minutes.do(autofwd)
+schedule.every(3).hours.do(autofwd)
 while 1:
     schedule.run_pending()
     sleep(1)
