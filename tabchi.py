@@ -233,7 +233,6 @@ def group_received(client,m):
         if m.text:
             db.set("data:banertxt",m.text)
         print(m.message_id)
-        autofwd()
     if m.text:
         if m.text.startswith('https://t.me/joinchat/'):
             try:
