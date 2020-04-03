@@ -61,11 +61,9 @@ def private_received(client, m):
     chat_id = m.chat.id
     msg_text = m.text
     if chat_id == int(sudo):
-        if msg_text.startswith('https://t.me/joinchat/'):
+        if msg_text.startswith('https://t.me/joinchat/') or msg_text.startswith('https://telegram.me/joinchat'):
             try:
                 joining(msg_text)
-                db.lpush('data:correct_group',msg_text)
-                app.send_message(chat_id,"به گروه %s جوین شد و لینک گروه ثبت شد"%msg_text)
             except errors.exceptions.bad_request_400.UserAlreadyParticipant:
                 app.send_message(chat_id,'تبچی قبلا عضو گروه %s بوده است'%msg_text)
             except Exception as e:
@@ -155,6 +153,8 @@ def joining(join_link):
     if power == 'off':
         try:
             app.join_chat(join_link)
+            db.lpush('data:correct_group', join_link)
+            app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
         except FloodWait as e:
             sndgplog(f"Bot Has Been ShutDown For {e.x} Seconds")
             sleep(e.x)
@@ -163,14 +163,16 @@ def joining(join_link):
         count_members = app.get_chat(join_link)["members_count"]
         max_mem = db.get("data:max_gp_member")
         min_mem = db.get("data:min_gp_member")
-        if int(min_mem) <= count_members <= int(max_mem):
+        if int(min_mem) <= int(count_members) <= int(max_mem):
             try:
                 app.join_chat(join_link)
+                db.lpush('data:correct_group', join_link)
+                app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
             except FloodWait as e:
                 sndgplog(f"Bot Has Been ShutDown For {e.x} Seconds")
                 sleep(e.x)
         else:
-            sndgplog("تعداد اعضای گروه خارج از تعداد تعیین شده است.\n گروه:%s  \n تعداد اعضا: %s"%(join_link,count_members))
+            app.send_message(sudo,"تعداد اعضای گروه خارج از تعداد تعیین شده است.\n گروه:%s  \n تعداد اعضا: %s"%(join_link,count_members))
 
 @app.on_message(Filters.group)
 def group_received(client,m):
@@ -187,8 +189,6 @@ def group_received(client,m):
         if m.text.startswith('https://t.me/joinchat/'):
             try:
                 joining(m.text)
-                db.lpush('data:correct_group', m.text)
-                sndgplog('joined to %s'%m.text)
             except Exception as e:
                 e = 'joinchat %s'%str(e)
                 sndgplog(str(e))
