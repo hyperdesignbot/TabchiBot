@@ -125,9 +125,9 @@ def autopost():
     gp_ids = db.lrange('gp_ids', 0, -1)
     baner_text = db.get("data:banertxt")
     for gpid in gp_ids:
-        m = random.randrange(120)
-        sndgplog("sleep %s second in post msg" % m)
-        sleep(m)
+        #m = random.randrange(120)
+        #sndgplog("sleep %s second in post msg" % m)
+        #sleep(m)
         try:
             app.send_message(int(gpid), baner_text)
         except errors.exceptions.bad_request_400.ChannelPrivate:
@@ -242,7 +242,7 @@ def group_received(client,m):
                 sndgplog(str(e))
 
 
-schedule.every(1).minutes.do(autopost())
+schedule.every(1).minutes.do(autopost)
 while 1:
     schedule.run_pending()
     sleep(1)
