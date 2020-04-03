@@ -154,7 +154,7 @@ def autopost():
             print(e)
             sndgplog(str(e))
 def autofwd():
-    print('auto fwd')
+    print('auto fwd2')
     gp_ids = db.lrange('gp_ids', 0, -1)
     source_group = db.get("data:gp_get_post")
     msg_id = db.get("data:msgid_of_baner")
