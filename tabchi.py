@@ -121,7 +121,7 @@ def autofwd():
     msg_id = db.get("data:msgid_of_baner")
     for gpid in gp_ids:
         m = random.randrange(120)
-        sndgplog("sleep %s in forward msg" % m)
+        sndgplog("sleep %s second in forward msg" % m)
         sleep(m)
         try:
             app.forward_messages(int(gpid), int(source_group), int(msg_id))
