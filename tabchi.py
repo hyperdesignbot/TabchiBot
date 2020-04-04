@@ -95,7 +95,7 @@ def incoming_received(client, m):
                                 save_data("./links.json", links)
             for item in urls:
                 print('join link is:',item)
-                #joining(item)
+                joining(item)
         if chat_id == int(sudo):
             print("in private sudo")
             if text.startswith('min '):
