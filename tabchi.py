@@ -246,7 +246,7 @@ def autofwd():
 def joining(join_link):
     print("in joining")
     power = db.get("tabchi:power")
-    print("power")
+    print("power",power)
     if power == 'off':
         print("in power off")
         app.join_chat(join_link)
