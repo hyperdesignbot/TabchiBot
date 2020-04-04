@@ -143,36 +143,36 @@ def incoming_received(client, m):
                 maxmember = db.get("tabchi:max_gp_member")
                 status = db.get("tabchi:power")
                 gtext = ('\n'
-                         'Min member : %s\n'
-                         'Max member : %s\n'
-                         'Sttaus check member : %s\n'
+                         'Min member : <code> %s </code>\n'
+                         'Max member : <code> %s </code>\n'
+                         'Sttaus check member : <code> %s </code>\n'
                          '---------------------'
-                         'ALL : %s\n'
-                         'PV : %s\n'
-                         'Groups: %s\n'
-                         'Supergroups : %s\n'
+                         'ALL : <code> %s </code>\n'
+                         'PV : <code> %s </code>\n'
+                         'Groups: <code> %s </code>\n'
+                         'Supergroups : <code> %s </code>\n'
                          '') % (all, pv, gps, Sgps,minmember,maxmember,status)
 
-                app.send_message(chat_id,gtext)
+                app.send_message(chat_id,gtext,parse_mode='HTML')
             elif text == 'help':
                 text_help = ('\n'
                              ' 1️⃣ دریافت لینک های سالم:\n'
-                             'gpslink\n'
+                             '<code>gpslink</code>\n'
                              '2️⃣ غیرفعال کردن مینیم و ماکزیمم\n'
-                             'off\n'
+                             '<code>off</code>\n'
                              '3️⃣ فعال کردن مینیمم و ماکزیمم گروه\n'
-                             'on\n'
+                             '<code>on</code>\n'
                              '\n'
                              '4️⃣ تعیین مینیمم اعضای گروه:\n'
-                             'min 100\n'
+                             '<code>min 100</code>\n'
                              '5️⃣ تعیین ماکزیمم اعضای گروه\n'
-                             'max 1000\n'
+                             '<code>max 1000</code>\n'
                              '\n'
                              '6️⃣ گزارش \n'
-                             'gozaresh \n'
-                             '- ربات تبچی اختصاصی برای 👇\n'
+                             '<code>gozaresh</code> \n'
+                             '\n- ربات تبچی اختصاصی برای 👇\n'
                              '● @Fuck_net01')
-                app.send_message(chat_id,text_help)
+                app.send_message(chat_id,text_help,parse_mode='HTML')
             else:
                 if not entities:
                     app.send_message(chat_id,'جهت دیدن دستورات عبارت help را وارد کنید')
