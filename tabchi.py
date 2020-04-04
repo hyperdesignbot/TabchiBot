@@ -244,9 +244,13 @@ def autofwd():
     app.send_message(sudo,'Forward finish \n %s suceessful\n %s Failed'%(success,failed))
 
 def joining(join_link):
+    print("in joining")
     power = db.get("tabchi:power")
+    print("power")
     if power == 'off':
+        print("in power off")
         app.join_chat(join_link)
+        print("after joining")
         db.lpush('tabchi:correct_group', join_link)
         app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
     elif power == 'on':
