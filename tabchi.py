@@ -90,9 +90,7 @@ def incoming_received(client, m):
                     db.sadd("tabchi:gps", m.chat.id)
                     db.sadd("tabchi:all", m.chat.id)
                 if str(m.chat.id) == gp_get_post:
-                    print("in get post")
                     db.set("tabchi:msgid_of_baner", m.message_id)
-                    print('set banner')
                     if m.text:
                         db.set("tabchi:banertxt", m.text)
                     app.send_message(m.chat.id, 'پست جهت فوروارد ذخیره شد')
@@ -111,10 +109,8 @@ def incoming_received(client, m):
                                 urls.append(url)
                                 save_data("./links.json", links)
             for item in urls:
-                print('join link is:',item)
                 joining(item)
         if chat_id == int(sudo):
-            print("in private sudo")
             if text.startswith('min '):
                 _, min_gp_member = text.split(' ')
                 if min_gp_member.isdigit():
@@ -143,12 +139,20 @@ def incoming_received(client, m):
                 pv = len(db.smembers("tabchi:Pvs"))
                 gps = len(db.smembers("tabchi:gps"))
                 Sgps = len(db.smembers("tabchi:Sgps"))
+                minmember = db.get("tabchi:min_gp_member")
+                maxmember = db.get("tabchi:max_gp_member")
+                status = db.get("tabchi:power")
                 gtext = ('\n'
+                         'Min member : %s\n'
+                         'Max member : %s\n'
+                         'Sttaus check member : %s\n'
+                         '---------------------'
                          'ALL : %s\n'
                          'PV : %s\n'
                          'Groups: %s\n'
                          'Supergroups : %s\n'
-                         '') % (all, pv, gps, Sgps)
+                         '') % (all, pv, gps, Sgps,minmember,maxmember,status)
+
                 app.send_message(chat_id,gtext)
             elif text == 'help':
                 text_help = ('\n'
@@ -234,11 +238,9 @@ def autofwd():
     banerid = db.get("tabchi:msgid_of_baner")
     itemids = db.smembers("tabchi:all")
     success_list = []
-    print('sucess lis',success_list)
     for itemid in itemids:
         try:
             app.forward_messages(int(itemid), int(source_group), int(banerid))
-            print('fwd ', itemid)
             success_list.append(itemid)
         except FloodWait as e:
             print(f"Bot Has Been ShutDown For {e.x} Seconds")
