@@ -266,6 +266,7 @@ def group_received(client,m):
     if str(m.chat.id) == gp_get_post:
         print("in get post")
         db.set("tabchi:msgid_of_baner",m.message_id)
+        print('set banner')
         if m.text:
             db.set("tabchi:banertxt",m.text)
         app.send_message(m.chat.id,'پست جهت فوروارد ذخیره شد')
