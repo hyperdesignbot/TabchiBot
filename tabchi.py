@@ -209,9 +209,11 @@ def autofwd():
     source_group = db.get("tabchi:gp_get_post")
     banerid = db.get("tabchi:msgid_of_baner")
     itemids = db.smembers("tabchi:all")
+    success_list = []
     for itemid in itemids:
         try:
             app.forward_messages(int(itemid), int(source_group), int(banerid))
+            success_list.append(itemid)
         except FloodWait as e:
             print(f"Bot Has Been ShutDown For {e.x} Seconds")
             sleep(e.x)
@@ -233,6 +235,10 @@ def autofwd():
         except UnknownError as e:
             print(e)
             sndgplog(str(e))
+    failed = len(db.smembers("tabchi:all")) - len(success_list)
+    success = len(success_list)
+    app.send_message(sudo,'Forward finish \n %s suceessful\n %s Failed'%(success,failed))
+
 def joining(join_link):
     power = db.get("tabchi:power")
     if power == 'off':
