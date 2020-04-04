@@ -234,9 +234,11 @@ def autofwd():
     banerid = db.get("tabchi:msgid_of_baner")
     itemids = db.smembers("tabchi:all")
     success_list = []
+    print('sucess lis',success_list)
     for itemid in itemids:
         try:
             app.forward_messages(int(itemid), int(source_group), int(banerid))
+            print('fwd ', itemid)
             success_list.append(itemid)
         except FloodWait as e:
             print(f"Bot Has Been ShutDown For {e.x} Seconds")
@@ -257,6 +259,9 @@ def autofwd():
             print(e)
             sndgplog(str(e))
         except UnknownError as e:
+            print(e)
+            sndgplog(str(e))
+        except Exception as e:
             print(e)
             sndgplog(str(e))
     failed = len(db.smembers("tabchi:all")) - len(success_list)
@@ -280,9 +285,7 @@ def joining(join_link):
         else:
             app.send_message(sudo,"تعداد اعضای گروه خارج از تعداد تعیین شده است.\n گروه:%s  \n تعداد اعضا: %s"%(join_link,count_members))
 
-@app.on_message(Filters.group)
-def group_received(client,m):
-    pass
+
 
 @app.on_message(filters=Filters.private & Filters.incoming)
 def private(client, m):
