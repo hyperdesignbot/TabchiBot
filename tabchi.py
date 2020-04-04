@@ -81,9 +81,6 @@ def incoming_received(client, m):
         entities = m['entities'] if m["entities"] else m["caption_entities"]
         text = m.text if m.text else m.caption
         gp_get_post = db.get("tabchi:gp_get_post")
-        print('gp for get post: ',gp_get_post, 'type is: ',type(gp_get_post))
-        print('chat id : ', chat_id, 'type is: ',type(chat_id))
-
         if m.chat.type:
             if m.chat.type == "supergroup":
                 if str(m.chat.id)[:4] == '-100':
