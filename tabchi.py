@@ -48,13 +48,6 @@ else:
 
 db_num = int(config["tabchi"]["DB"])
 db = StrictRedis(host="localhost", port=6379, decode_responses=True, db=db_num)
-db.set("tabchi:power", "off")
-db.set("tabchi:gp_get_post", config["tabchi"]["gplog"])
-db.lpush("tabchi:correct_group", " ")
-db.set("tabchi:min_gp_member", "10")
-db.set("tabchi:max_gp_member", "1000")
-db.set("tabchi:msgid_of_baner", "1")
-db.lpush("gp_ids", config["tabchi"]["gplog"])
 app = Client(session_name=config["tabchi"]["session_name"],config_file="./config.ini")
 gplog = int(config["tabchi"]["gplog"])
 tabchi = config["tabchi"]["tabchi"].split(" ")
@@ -251,30 +244,20 @@ def autofwd():
     app.send_message(sudo,'Forward finish \n %s suceessful\n %s Failed'%(success,failed))
 
 def joining(join_link):
-    print("in joining")
     power = db.get("tabchi:power")
-    print("power",power)
     if power == 'off':
-        print("in power off")
         app.join_chat(join_link)
-        print("after joining")
         db.lpush('tabchi:correct_group', join_link)
         app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
     elif power == 'on':
-        print("in power on")
         count_members = app.get_chat(join_link)["members_count"]
-        print("count:",count_members)
         max_mem = db.get("tabchi:max_gp_member")
         min_mem = db.get("tabchi:min_gp_member")
-        print("max: ",max_mem,"min: ",min_mem)
         if int(min_mem) <= int(count_members) <= int(max_mem):
-            print("in min and max")
             app.join_chat(join_link)
-            print("after join max min")
             db.lpush('tabchi:correct_group', join_link)
             app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
         else:
-            print("not in limit")
             app.send_message(sudo,"تعداد اعضای گروه خارج از تعداد تعیین شده است.\n گروه:%s  \n تعداد اعضا: %s"%(join_link,count_members))
 
 @app.on_message(Filters.group)
