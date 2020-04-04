@@ -10,6 +10,8 @@ from pyrogram.errors import (
 )
 import _thread
 import schedule
+import re
+import json
 config = ConfigParser()
 if path.isfile("./config.ini"):
     config.read("config.ini")
@@ -35,12 +37,12 @@ else:
     with open("config.ini", "w") as configfile:
         config.write(configfile)
     r = StrictRedis(host="localhost", port=6379, decode_responses=True, db=int(DB))
-    r.set("data:power", "off")
-    r.set("data:gp_get_post", config["tabchi"]["gplog"])
-    r.lpush("data:correct_group", " ")
-    r.set("data:min_gp_member", "10")
-    r.set("data:max_gp_member", "1000")
-    r.set("data:msgid_of_baner", "1")
+    r.set("tabchi:power", "off")
+    r.set("tabchi:gp_get_post", config["tabchi"]["gplog"])
+    r.lpush("tabchi:correct_group", " ")
+    r.set("tabchi:min_gp_member", "10")
+    r.set("tabchi:max_gp_member", "1000")
+    r.set("tabchi:msgid_of_baner", "1")
     r.lpush("gp_ids", config["tabchi"]["gplog"])
 
 
@@ -55,78 +57,125 @@ app.start()
 
 def sndgplog(text):
     app.send_message(gplog, text, parse_mode="MarkDown",disable_web_page_preview=True)
+def load_data(fname):
+    try:
+        f = open(fname, "rb")
+        return json.loads(f.read())
+    except Exception as e:
+        print(e)
+        return []
+
+
+def save_data(fname, data):
+    f = open(fname, "w")
+    f.write(json.dumps(data))
+    f.close()
 
 print("Bot Now Running")
 sndgplog("Bot Now Running")
 
-@app.on_message(Filters.private)
-def private_received(client, m):
-    chat_id = m.chat.id
-    msg_text = m.text
-    if chat_id == int(sudo):
-        if msg_text.startswith('https://t.me/joinchat/') or msg_text.startswith('https://telegram.me/joinchat'):
-            try:
-                joining(msg_text)
-            except errors.exceptions.bad_request_400.UserAlreadyParticipant:
-                app.send_message(chat_id,'تبچی قبلا عضو گروه %s بوده است'%msg_text)
-            except Exception as e:
-                app.send_message(chat_id,'لینک گروه صحیح نیست')
-                sndgplog(str(e))
-
-        elif msg_text.startswith('min '):
-            _, min_gp_member = msg_text.split(' ')
-            if min_gp_member.isdigit():
-                app.send_message(chat_id,'حداقل تعداد اعضای سوپرگروه به %s تغییر یافت'%min_gp_member)
-                db.set("data:min_gp_member",min_gp_member)
+@app.on_message(Filters.incoming)
+def incoming_received(client, m):
+    try:
+        chat_id = m.chat.id
+        entities = m['entities'] if m["entities"] else m["caption_entities"]
+        text = m.text if m.text else m.caption
+        if entities:
+            for i in entities:
+                if i['type'] == "url":
+                    if re.findall("(t|telegram|tlgrm)(\.)(me|org|dog)(/)(joinchat)(/)(.{22})", text):
+                        r = re.findall("(t|telegram|tlgrm)(\.)(me|org|dog)(/)(joinchat)(/)(.{22})", text)
+                        for v in r:
+                            url = 'https://' + ''.join(v)
+                            links = load_data("./links.json")
+                            if url not in links:
+                                links.append(url)
+                                save_data("./links.json", links)
+            items = load_data("./links.json")
+            for item in items:
+                joining(item)
+        if chat_id == int(sudo):
+            if text.startswith('min '):
+                _, min_gp_member = text.split(' ')
+                if min_gp_member.isdigit():
+                    app.send_message(chat_id,'حداقل تعداد اعضای سوپرگروه به %s تغییر یافت'%min_gp_member)
+                    db.set("tabchi:min_gp_member",min_gp_member)
+                else:
+                    app.send_message(chat_id,'دستور صحیح نیست')
+            elif text.startswith('max'):
+                _, max_gp_member = text.split(' ')
+                if max_gp_member.isdigit():
+                    app.send_message(chat_id,'حداکثر تعداد اعضای سوپرگروه به %s تغییر یافت'%max_gp_member)
+                    db.set("tabchi:max_gp_member", max_gp_member)
+                else:
+                    app.send_message(chat_id,'دستور صحیح نیست')
+            elif text == 'on':
+                app.send_message(chat_id,'ربات به on تغییر یافت')
+                db.set("tabchi:power", "on")
+            elif text == 'off':
+                app.send_message(chat_id,'ربات به off تغییر یافت')
+                db.set("tabchi:power", "off")
+            elif text.startswith("gpslink"):
+                links = db.lrange('tabchi:correct_group',0,-1)
+                app.send_message(chat_id,links)
+            elif text == 'gozaresh':
+                all = len(db.smembers("tabchi:all"))
+                pv = len(db.smembers("tabchi:Pvs"))
+                gps = len(db.smembers("tabchi:gps"))
+                Sgps = len(db.smembers("tabchi:Sgps"))
+                gtext = ('\n'
+                         'ALL : %s\n'
+                         'PV : %s\n'
+                         'Groups: %s\n'
+                         'Supergroups : %s\n'
+                         '') % (all, pv, gps, Sgps)
+                app.send_message(chat_id,gtext)
+            elif text == 'help':
+                text_help = ('\n'
+                             ' 1️⃣ دریافت لینک های سالم:\n'
+                             'gpslink\n'
+                             '2️⃣ غیرفعال کردن مینیم و ماکزیمم\n'
+                             'off\n'
+                             '3️⃣ فعال کردن مینیمم و ماکزیمم گروه\n'
+                             'on\n'
+                             '\n'
+                             '4️⃣ تعیین مینیمم اعضای گروه:\n'
+                             'min 100\n'
+                             '5️⃣ تعیین ماکزیمم اعضای گروه\n'
+                             'max 1000\n'
+                             '\n'
+                             '6️⃣ گزارش \n'
+                             'gozaresh \n'
+                             '- ربات تبچی اختصاصی برای 👇\n'
+                             '● @Fuck_net01')
+                app.send_message(chat_id,text_help)
             else:
-                app.send_message(chat_id,'دستور صحیح نیست')
-        elif msg_text.startswith('max'):
-            _, max_gp_member = msg_text.split(' ')
-            if max_gp_member.isdigit():
-                app.send_message(chat_id,'حداکثر تعداد اعضای سوپرگروه به %s تغییر یافت'%max_gp_member)
-                db.set("data:max_gp_member", max_gp_member)
-            else:
-                app.send_message(chat_id,'دستور صحیح نیست')
-        elif msg_text == 'on':
-            app.send_message(chat_id,'ربات به on تغییر یافت')
-            db.set("data:power", "on")
-        elif msg_text == 'off':
-            app.send_message(chat_id,'ربات به off تغییر یافت')
-            db.set("data:power", "off")
-        elif msg_text.startswith("gpslink"):
-            links = db.lrange('data:correct_group',0,-1)
-            app.send_message(chat_id,links)
-        elif msg_text == 'help':
-            text_help = ('\n'
-                         ' 1️⃣ دریافت لینک های سالم:\n'
-                         'gpslink\n'
-                         '2️⃣ غیرفعال کردن مینیم و ماکزیمم\n'
-                         'off\n'
-                         '3️⃣ فعال کردن مینیمم و ماکزیمم گروه\n'
-                         'on\n'
-                         '\n'
-                         '4️⃣ تعیین مینیمم اعضای گروه:\n'
-                         'min 100\n'
-                         '5️⃣ تعیین ماکزیمم اعضای گروه\n'
-                         'max 1000\n'
-                         '\n'
-                         '')
-            app.send_message(chat_id,text_help)
-        else:
-            app.send_message(chat_id,'جهت دیدن دستورات عبارت help را وارد کنید')
-    else:
-        msg_other = ('سورس اختصاصی برای :\n'
-                     '@fuck_net01\n'
-                     '')
-        app.send_message(chat_id,msg_other)
-
+                app.send_message(chat_id,'جهت دیدن دستورات عبارت help را وارد کنید')
+    except FloodWait as e:
+        print(f"Bot Has Been ShutDown For {e.x} Seconds")
+        sleep(e.x)
+    except BadRequest as e:
+        print(e)
+        sndgplog(str(e))
+    except Flood as e:
+        print(e)
+        sndgplog(str(e))
+    except InternalServerError as e:
+        print(e)
+        sndgplog(str(e))
+    except SeeOther as e:
+        print(e)
+        sndgplog(str(e))
+    except Unauthorized as e:
+        print(e)
+        sndgplog(str(e))
+    except UnknownError as e:
+        print(e)
+        sndgplog(str(e))
 def autopost():
     gp_ids = db.lrange('gp_ids', 0, -1)
-    baner_text = db.get("data:banertxt")
+    baner_text = db.get("tabchi:banertxt")
     for gpid in gp_ids:
-        #m = random.randrange(120)
-        #sndgplog("sleep %s second in post msg" % m)
-        #sleep(m)
         try:
             app.send_message(int(gpid), baner_text)
         except errors.exceptions.bad_request_400.ChannelPrivate:
@@ -157,21 +206,12 @@ def autopost():
             print(e)
             sndgplog(str(e))
 def autofwd():
-    gp_ids = db.lrange('gp_ids', 0, -1)
-    source_group = db.get("data:gp_get_post")
-    msg_id = db.get("data:msgid_of_baner")
-    for gpid in gp_ids:
-        #m = random.randrange(120)
-        #sndgplog("sleep %s second in forward msg" % m)
-        #sleep(m)
+    source_group = db.get("tabchi:gp_get_post")
+    banerid = db.get("tabchi:msgid_of_baner")
+    itemids = db.smembers("tabchi:all")
+    for itemid in itemids:
         try:
-            app.forward_messages(int(gpid), int(source_group), int(msg_id))
-        except errors.exceptions.bad_request_400.ChannelPrivate:
-            index = gp_ids.index(gpid)
-            db.lrem('gp_ids', index, gpid)
-        except errors.exceptions.forbidden_403.ChatWriteForbidden:
-            index = gp_ids.index(gpid)
-            db.lrem('gp_ids', index, gpid)
+            app.forward_messages(int(itemid), int(source_group), int(banerid))
         except FloodWait as e:
             print(f"Bot Has Been ShutDown For {e.x} Seconds")
             sleep(e.x)
@@ -194,49 +234,42 @@ def autofwd():
             print(e)
             sndgplog(str(e))
 def joining(join_link):
-    power = db.get("data:power")
+    power = db.get("tabchi:power")
     if power == 'off':
-        try:
-            app.join_chat(join_link)
-            db.lpush('data:correct_group', join_link)
-            app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
-        except FloodWait as e:
-            sndgplog(f"Bot Has Been ShutDown For {e.x} Seconds")
-            sleep(e.x)
-
+        app.join_chat(join_link)
+        db.lpush('tabchi:correct_group', join_link)
+        app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
     elif power == 'on':
         count_members = app.get_chat(join_link)["members_count"]
-        max_mem = db.get("data:max_gp_member")
-        min_mem = db.get("data:min_gp_member")
+        max_mem = db.get("tabchi:max_gp_member")
+        min_mem = db.get("tabchi:min_gp_member")
         if int(min_mem) <= int(count_members) <= int(max_mem):
-            try:
-                app.join_chat(join_link)
-                db.lpush('data:correct_group', join_link)
-                app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
-            except FloodWait as e:
-                sndgplog(f"Bot Has Been ShutDown For {e.x} Seconds")
-                sleep(e.x)
+            app.join_chat(join_link)
+            db.lpush('tabchi:correct_group', join_link)
+            app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
         else:
             app.send_message(sudo,"تعداد اعضای گروه خارج از تعداد تعیین شده است.\n گروه:%s  \n تعداد اعضا: %s"%(join_link,count_members))
 
 @app.on_message(Filters.group)
 def group_received(client,m):
-    gp_get_post = db.get("data:gp_get_post")
-    list_gp_ids = db.lrange('gp_ids',0,-1)
-    if str(m.chat.id) not in list_gp_ids:
-        db.lpush('gp_ids',m.chat.id)
+    gp_get_post = db.get("tabchi:gp_get_post")
     if str(m.chat.id) == gp_get_post:
-        db.set("data:msgid_of_baner",m.message_id)
+        db.set("tabchi:msgid_of_baner",m.message_id)
         if m.text:
-            db.set("data:banertxt",m.text)
+            db.set("tabchi:banertxt",m.text)
         app.send_message(m.chat.id,'پست جهت فوروارد ذخیره شد')
-    if m.text:
-        if m.text.startswith('https://t.me/joinchat/'):
-            try:
-                joining(m.text)
-            except Exception as e:
-                e = 'joinchat %s'%str(e)
-                sndgplog(str(e))
+        autofwd()
+    if str(m.chat.id)[:4] == '-100':
+        db.sadd("tabchi:Sgps", m.chat.id)
+        db.sadd("tabchi:all", m.chat.id)
+    else:
+        db.sadd("tabchi:gps", m.chat.id)
+        db.sadd("tabchi:all", m.chat.id)
+
+@app.on_message(filters=Filters.private & Filters.incoming)
+def private(client, m):
+    db.sadd("tabchi:Pvs", m.chat.id)
+    db.sadd("tabchi:all", m.chat.id)
 
 
 schedule.every(3).hours.do(autofwd)
