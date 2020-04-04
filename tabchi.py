@@ -254,14 +254,20 @@ def joining(join_link):
         db.lpush('tabchi:correct_group', join_link)
         app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
     elif power == 'on':
+        print("in power on")
         count_members = app.get_chat(join_link)["members_count"]
+        print("count:",count_members)
         max_mem = db.get("tabchi:max_gp_member")
         min_mem = db.get("tabchi:min_gp_member")
+        print("max: ",max_mem,"min: ",min_mem)
         if int(min_mem) <= int(count_members) <= int(max_mem):
+            print("in min and max")
             app.join_chat(join_link)
+            print("after join max min")
             db.lpush('tabchi:correct_group', join_link)
             app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
         else:
+            print("not in limit")
             app.send_message(sudo,"تعداد اعضای گروه خارج از تعداد تعیین شده است.\n گروه:%s  \n تعداد اعضا: %s"%(join_link,count_members))
 
 @app.on_message(Filters.group)
