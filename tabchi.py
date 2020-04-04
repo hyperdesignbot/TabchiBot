@@ -193,6 +193,9 @@ def incoming_received(client, m):
     except UnknownError as e:
         print(e)
         sndgplog(str(e))
+    except Exception as e:
+        print(e)
+        sndgplog(str(e))
 def autopost():
     gp_ids = db.lrange('gp_ids', 0, -1)
     baner_text = db.get("tabchi:banertxt")
