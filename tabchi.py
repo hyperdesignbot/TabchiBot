@@ -81,6 +81,7 @@ def incoming_received(client, m):
         entities = m['entities'] if m["entities"] else m["caption_entities"]
         text = m.text if m.text else m.caption
         if entities:
+            print("entity: ", entities)
             for i in entities:
                 if i['type'] == "url":
                     if re.findall("(t|telegram|tlgrm)(\.)(me|org|dog)(/)(joinchat)(/)(.{22})", text):
@@ -95,6 +96,7 @@ def incoming_received(client, m):
             for item in items:
                 joining(item)
         if chat_id == int(sudo):
+            print("in private sudo")
             if text.startswith('min '):
                 _, min_gp_member = text.split(' ')
                 if min_gp_member.isdigit():
@@ -150,7 +152,8 @@ def incoming_received(client, m):
                              '● @Fuck_net01')
                 app.send_message(chat_id,text_help)
             else:
-                app.send_message(chat_id,'جهت دیدن دستورات عبارت help را وارد کنید')
+                if not entities:
+                    app.send_message(chat_id,'جهت دیدن دستورات عبارت help را وارد کنید')
     except FloodWait as e:
         print(f"Bot Has Been ShutDown For {e.x} Seconds")
         sleep(e.x)
@@ -260,6 +263,7 @@ def joining(join_link):
 def group_received(client,m):
     gp_get_post = db.get("tabchi:gp_get_post")
     if str(m.chat.id) == gp_get_post:
+        print("in get post")
         db.set("tabchi:msgid_of_baner",m.message_id)
         if m.text:
             db.set("tabchi:banertxt",m.text)
