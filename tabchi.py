@@ -48,6 +48,13 @@ else:
 
 db_num = int(config["tabchi"]["DB"])
 db = StrictRedis(host="localhost", port=6379, decode_responses=True, db=db_num)
+db.set("tabchi:power", "off")
+db.set("tabchi:gp_get_post", config["tabchi"]["gplog"])
+db.lpush("tabchi:correct_group", " ")
+db.set("tabchi:min_gp_member", "10")
+db.set("tabchi:max_gp_member", "1000")
+db.set("tabchi:msgid_of_baner", "1")
+db.lpush("gp_ids", config["tabchi"]["gplog"])
 app = Client(session_name=config["tabchi"]["session_name"],config_file="./config.ini")
 gplog = int(config["tabchi"]["gplog"])
 tabchi = config["tabchi"]["tabchi"].split(" ")
