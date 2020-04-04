@@ -80,6 +80,25 @@ def incoming_received(client, m):
         chat_id = m.chat.id
         entities = m['entities'] if m["entities"] else m["caption_entities"]
         text = m.text if m.text else m.caption
+        gp_get_post = db.get("tabchi:gp_get_post")
+        if m.chat.type:
+            if m.chat.type == "supergroup":
+                if str(m.chat.id)[:4] == '-100':
+                    print("add Sgrp")
+                    db.sadd("tabchi:Sgps", m.chat.id)
+                    db.sadd("tabchi:all", m.chat.id)
+                else:
+                    print("add gps")
+                    db.sadd("tabchi:gps", m.chat.id)
+                    db.sadd("tabchi:all", m.chat.id)
+                if str(m.chat.id) == gp_get_post:
+                    print("in get post")
+                    db.set("tabchi:msgid_of_baner", m.message_id)
+                    print('set banner')
+                    if m.text:
+                        db.set("tabchi:banertxt", m.text)
+                    app.send_message(m.chat.id, 'پست جهت فوروارد ذخیره شد')
+                    autofwd()
         if entities:
             urls = []
             for i in entities:
@@ -262,21 +281,7 @@ def joining(join_link):
 
 @app.on_message(Filters.group)
 def group_received(client,m):
-    gp_get_post = db.get("tabchi:gp_get_post")
-    if str(m.chat.id) == gp_get_post:
-        print("in get post")
-        db.set("tabchi:msgid_of_baner",m.message_id)
-        print('set banner')
-        if m.text:
-            db.set("tabchi:banertxt",m.text)
-        app.send_message(m.chat.id,'پست جهت فوروارد ذخیره شد')
-        autofwd()
-    if str(m.chat.id)[:4] == '-100':
-        db.sadd("tabchi:Sgps", m.chat.id)
-        db.sadd("tabchi:all", m.chat.id)
-    else:
-        db.sadd("tabchi:gps", m.chat.id)
-        db.sadd("tabchi:all", m.chat.id)
+    pass
 
 @app.on_message(filters=Filters.private & Filters.incoming)
 def private(client, m):
