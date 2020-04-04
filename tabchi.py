@@ -81,7 +81,6 @@ def incoming_received(client, m):
         entities = m['entities'] if m["entities"] else m["caption_entities"]
         text = m.text if m.text else m.caption
         if entities:
-            print("entity: ", entities)
             for i in entities:
                 if i['type'] == "url":
                     if re.findall("(t|telegram|tlgrm)(\.)(me|org|dog)(/)(joinchat)(/)(.{22})", text):
@@ -94,6 +93,7 @@ def incoming_received(client, m):
                                 save_data("./links.json", links)
             items = load_data("./links.json")
             for item in items:
+                print('join link is:',item)
                 joining(item)
         if chat_id == int(sudo):
             print("in private sudo")
