@@ -151,7 +151,7 @@ def incoming_received(client, m):
                          'PV : <code> %s </code>\n'
                          'Groups: <code> %s </code>\n'
                          'Supergroups : <code> %s </code>\n'
-                         '') % (all, pv, gps, Sgps,minmember,maxmember,status)
+                         '') % (minmember,maxmember,status,all, pv, gps, Sgps)
 
                 app.send_message(chat_id,gtext,parse_mode='HTML')
             elif text == 'help':
