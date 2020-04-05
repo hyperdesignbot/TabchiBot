@@ -182,8 +182,8 @@ def incoming_received(client, m):
                     app.send_message(chat_id,'جهت دیدن دستورات عبارت help را وارد کنید')
     except FloodWait as e:
         print(f"Bot Has Been ShutDown For {e.x} Seconds")
-        sleep(e.x)
         sndgplog(f"Bot Has Been ShutDown For {e.x} Seconds")
+        sleep(e.x)
     except BadRequest as e:
         print(e)
         sndgplog(str(e))
