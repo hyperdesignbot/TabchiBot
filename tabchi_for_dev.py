@@ -75,7 +75,7 @@ def save_data(fname, data):
 print("Bot Now Running")
 sndgplog("Bot Now Running")
 
-@app.on_message(Filters.private)
+@app.on_message(Filters.incoming)
 def incoming_received(client, m):
     try:
         chat_id = m.chat.id
