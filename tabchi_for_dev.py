@@ -250,6 +250,7 @@ def autofwd():
             success_list.append(itemid)
         except FloodWait as e:
             print(f"Bot Has Been ShutDown For {e.x} Seconds")
+
             sndgplog(f"Bot Has Been ShutDown For {e.x} Seconds")
             sleep(e.x)
         except BadRequest as e:
