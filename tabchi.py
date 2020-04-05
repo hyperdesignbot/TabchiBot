@@ -57,19 +57,6 @@ app.start()
 
 def sndgplog(text):
     app.send_message(gplog, text, parse_mode="MarkDown",disable_web_page_preview=True)
-def load_data(fname):
-    try:
-        f = open(fname, "rb")
-        return json.loads(f.read())
-    except Exception as e:
-        print(e)
-        return []
-
-
-def save_data(fname, data):
-    f = open(fname, "w")
-    f.write(json.dumps(data))
-    f.close()
 
 print("Bot Now Running")
 sndgplog("Bot Now Running")
@@ -103,11 +90,10 @@ def incoming_received(client, m):
                         r = re.findall("(t|telegram|tlgrm)(\.)(me|org|dog)(/)(joinchat)(/)(.{22})", text)
                         for v in r:
                             url = 'https://' + ''.join(v)
-                            links = load_data("./links.json")
+                            links = db.smembers("tabchi:links")
                             if url not in links:
-                                links.append(url)
+                                db.sadd("tabchi:links", url)
                                 urls.append(url)
-                                save_data("./links.json", links)
             for item in urls:
                 joining(item)
         if chat_id == int(sudo):
@@ -178,6 +164,7 @@ def incoming_received(client, m):
                     app.send_message(chat_id,'جهت دیدن دستورات عبارت help را وارد کنید')
     except FloodWait as e:
         print(f"Bot Has Been ShutDown For {e.x} Seconds")
+        sndgplog(f"Bot Has Been ShutDown For {e.x} Seconds")
         sleep(e.x)
     except BadRequest as e:
         print(e)
@@ -214,6 +201,7 @@ def autopost():
             db.lrem('gp_ids', index, gpid)
         except FloodWait as e:
             print(f"Bot Has Been ShutDown For {e.x} Seconds")
+            sndgplog(f"Bot Has Been ShutDown For {e.x} Seconds")
             sleep(e.x)
         except BadRequest as e:
             print(e)
@@ -244,6 +232,7 @@ def autofwd():
             success_list.append(itemid)
         except FloodWait as e:
             print(f"Bot Has Been ShutDown For {e.x} Seconds")
+            sndgplog(f"Bot Has Been ShutDown For {e.x} Seconds")
             sleep(e.x)
         except BadRequest as e:
             print(e)
