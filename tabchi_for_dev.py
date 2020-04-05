@@ -104,15 +104,16 @@ def incoming_received(client, m):
                         r = re.findall("(t|telegram|tlgrm)(\.)(me|org|dog)(/)(joinchat)(/)(.{22})", text)
                         for v in r:
                             url = 'https://' + ''.join(v)
-                            links = load_data("./links.json")
+                            links = db.smembers("tabchi:links")
                             if url not in links:
-                                links.append(url)
-                                urls.append(url)
-                                save_data("./links.json", links)
+                                db.sadd("tabchi:links",url)
+                                print('add to links',url)
+                            urls.append(url)
+
             print('urls is: ', urls)
             for item in urls:
-                print('item is: ',item)
                 #joining(item)
+                print('joined link : ',item)
         if chat_id == int(sudo):
             if text.startswith('min '):
                 _, min_gp_member = text.split(' ')
