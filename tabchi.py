@@ -92,7 +92,6 @@ def incoming_received(client, m):
                             url = 'https://' + ''.join(v)
                             links = db.smembers("tabchi:links")
                             if url not in links:
-                                db.sadd("tabchi:links", url)
                                 urls.append(url)
             for item in urls:
                 joining(item)
@@ -271,6 +270,7 @@ def joining(join_link):
         min_mem = db.get("tabchi:min_gp_member")
         if int(min_mem) <= int(count_members) <= int(max_mem):
             app.join_chat(join_link)
+            db.sadd("tabchi:links", join_link)
             db.lpush('tabchi:correct_group', join_link)
             app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
         else:

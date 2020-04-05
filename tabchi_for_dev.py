@@ -277,7 +277,6 @@ def autofwd():
     app.send_message(sudo,'Forward finish \n %s suceessful\n %s Failed'%(success,failed))
 
 def joining(join_link):
-    try:
         power = db.get("tabchi:power")
         if power == 'off':
             app.join_chat(join_link)
@@ -299,10 +298,7 @@ def joining(join_link):
 
             else:
                 app.send_message(sudo,"تعداد اعضای گروه خارج از تعداد تعیین شده است.\n گروه:%s  \n تعداد اعضا: %s"%(join_link,count_members))
-    except FloodWait as e:
-        print(f"Bot Has Been ShutDown For {e.x} Seconds")
-        sndgplog(f"Bot Has Been ShutDown For {e.x} Seconds")
-        sleep(e.x)
+
 
 
 @app.on_message(filters=Filters.private & Filters.incoming)
