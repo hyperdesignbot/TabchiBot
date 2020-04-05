@@ -107,6 +107,7 @@ def incoming_received(client, m):
                             links = load_data("./links.json")
                             print('url is:',url)
                             if url not in links:
+                                print('url not in links; ',url)
                                 links.append(url)
                                 urls.append(url)
                                 save_data("./links.json", links)
