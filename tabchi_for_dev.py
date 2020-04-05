@@ -97,7 +97,6 @@ def incoming_received(client, m):
                     app.send_message(m.chat.id, 'پست جهت فوروارد ذخیره شد')
                     autofwd()
         if entities:
-            print("entity is : ",entities)
             urls = []
             for i in entities:
                 if i['type'] == "url":
@@ -106,6 +105,7 @@ def incoming_received(client, m):
                         for v in r:
                             url = 'https://' + ''.join(v)
                             links = load_data("./links.json")
+                            print('url is: ',url)
                             if url not in links:
                                 links.append(url)
                                 urls.append(url)
