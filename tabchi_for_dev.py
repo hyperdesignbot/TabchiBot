@@ -183,7 +183,7 @@ def incoming_received(client, m):
     except FloodWait as e:
         print(f"Bot Has Been ShutDown For {e.x} Seconds")
         sleep(e.x)
-        sndgplog(str(e))
+        sndgplog(f"Bot Has Been ShutDown For {e.x} Seconds")
     except BadRequest as e:
         print(e)
         sndgplog(str(e))
@@ -250,7 +250,6 @@ def autofwd():
             success_list.append(itemid)
         except FloodWait as e:
             print(f"Bot Has Been ShutDown For {e.x} Seconds")
-
             sndgplog(f"Bot Has Been ShutDown For {e.x} Seconds")
             sleep(e.x)
         except BadRequest as e:
