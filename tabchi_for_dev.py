@@ -111,7 +111,7 @@ def incoming_received(client, m):
                             urls.append(url)
 
             print('urls is: ', urls)
-            for item in urls:
+            for item in set(list(urls)):
                 #joining(item)
                 print('joined link : ',item)
         if chat_id == int(sudo):
