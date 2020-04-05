@@ -108,11 +108,11 @@ def incoming_received(client, m):
                             if url not in links:
                                 db.sadd("tabchi:links",url)
                                 print('add to links',url)
-                            urls.append(url)
+                                urls.append(url)
 
             print('urls is: ', urls)
             for item in set(list(urls)):
-                #joining(item)
+                joining(item)
                 print('joined link : ',item)
         if chat_id == int(sudo):
             if text.startswith('min '):
