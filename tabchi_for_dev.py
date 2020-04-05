@@ -75,7 +75,7 @@ def save_data(fname, data):
 print("Bot Now Running")
 sndgplog("Bot Now Running")
 
-@app.on_message(Filters.incoming)
+@app.on_message(Filters.private)
 def incoming_received(client, m):
     try:
         chat_id = m.chat.id
@@ -105,8 +105,7 @@ def incoming_received(client, m):
                         for v in r:
                             url = 'https://' + ''.join(v)
                             links = load_data("./links.json")
-                            if url == 'https://t.me/joinchat/O9TOdBf6xkd1Lv9pm-1Enw':
-                                app.send_message(chat_id,m.text)
+                            print('url is:',url)
                             if url not in links:
                                 links.append(url)
                                 urls.append(url)
