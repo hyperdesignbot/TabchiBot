@@ -105,6 +105,7 @@ def incoming_received(client, m):
                         for v in r:
                             url = 'https://' + ''.join(v)
                             links = db.smembers("tabchi:links")
+                            print('links : ',links)
                             if url not in links:
                                 db.sadd("tabchi:links",url)
                                 print('add to links',url)
