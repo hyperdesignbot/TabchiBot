@@ -105,14 +105,13 @@ def incoming_received(client, m):
                         for v in r:
                             url = 'https://' + ''.join(v)
                             links = db.smembers("tabchi:links")
-                            print('links : ',links)
                             if url not in links:
                                 db.sadd("tabchi:links",url)
-                                print('add to links',url)
                                 urls.append(url)
 
             print('urls is: ', urls)
             for item in set(list(urls)):
+                print('item wait for join: ',item)
                 joining(item)
                 print('joined link : ',item)
         if chat_id == int(sudo):
@@ -286,7 +285,9 @@ def joining(join_link):
         max_mem = db.get("tabchi:max_gp_member")
         min_mem = db.get("tabchi:min_gp_member")
         if int(min_mem) <= int(count_members) <= int(max_mem):
+            print("in limit block")
             app.join_chat(join_link)
+            print('after join in limit block')
             db.lpush('tabchi:correct_group', join_link)
             app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
         else:
