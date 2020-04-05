@@ -278,26 +278,30 @@ def autofwd():
     app.send_message(sudo,'Forward finish \n %s suceessful\n %s Failed'%(success,failed))
 
 def joining(join_link):
-    power = db.get("tabchi:power")
-    if power == 'off':
-        app.join_chat(join_link)
-        db.lpush('tabchi:correct_group', join_link)
-        app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
-
-    elif power == 'on':
-        count_members = app.get_chat(join_link)["members_count"]
-        max_mem = db.get("tabchi:max_gp_member")
-        min_mem = db.get("tabchi:min_gp_member")
-        if int(min_mem) <= int(count_members) <= int(max_mem):
-            print("in limit block")
+    try:
+        power = db.get("tabchi:power")
+        if power == 'off':
             app.join_chat(join_link)
-            print('after join in limit block')
             db.lpush('tabchi:correct_group', join_link)
             app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
 
-        else:
-            app.send_message(sudo,"تعداد اعضای گروه خارج از تعداد تعیین شده است.\n گروه:%s  \n تعداد اعضا: %s"%(join_link,count_members))
+        elif power == 'on':
+            count_members = app.get_chat(join_link)["members_count"]
+            max_mem = db.get("tabchi:max_gp_member")
+            min_mem = db.get("tabchi:min_gp_member")
+            if int(min_mem) <= int(count_members) <= int(max_mem):
+                print("in limit block")
+                app.join_chat(join_link)
+                print('after join in limit block')
+                db.lpush('tabchi:correct_group', join_link)
+                app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
 
+            else:
+                app.send_message(sudo,"تعداد اعضای گروه خارج از تعداد تعیین شده است.\n گروه:%s  \n تعداد اعضا: %s"%(join_link,count_members))
+    except FloodWait as e:
+        print(f"Bot Has Been ShutDown For {e.x} Seconds")
+        sndgplog(f"Bot Has Been ShutDown For {e.x} Seconds")
+        sleep(e.x)
 
 
 @app.on_message(filters=Filters.private & Filters.incoming)
