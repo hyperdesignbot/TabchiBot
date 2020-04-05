@@ -219,7 +219,7 @@ def autopost():
             db.lrem('gp_ids', index, gpid)
         except FloodWait as e:
             print(f"Bot Has Been ShutDown For {e.x} Seconds")
-            sndgplog(str(e))
+            sndgplog(f"Bot Has Been ShutDown For {e.x} Seconds")
             sleep(e.x)
         except BadRequest as e:
             print(e)
@@ -250,7 +250,7 @@ def autofwd():
             success_list.append(itemid)
         except FloodWait as e:
             print(f"Bot Has Been ShutDown For {e.x} Seconds")
-            sndgplog(str(e))
+            sndgplog(f"Bot Has Been ShutDown For {e.x} Seconds")
             sleep(e.x)
         except BadRequest as e:
             print(e)
