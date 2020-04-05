@@ -3,6 +3,7 @@ from redis import StrictRedis
 from configparser import ConfigParser
 from time import sleep
 from os import path
+from ruamel.yaml import YAML
 import random
 from pyrogram.errors import (
     BadRequest, Flood, InternalServerError,
@@ -49,6 +50,8 @@ else:
 db_num = int(config["tabchi"]["DB"])
 db = StrictRedis(host="localhost", port=6379, decode_responses=True, db=db_num)
 app = Client(session_name=config["tabchi"]["session_name"],config_file="./config.ini")
+yaml = YAML(typ='safe', pure=True)
+txt = yaml.load(open("txt.yml"))
 gplog = int(config["tabchi"]["gplog"])
 tabchi = config["tabchi"]["tabchi"].split(" ")
 sudo = config["tabchi"]["sudo"]
@@ -109,6 +112,7 @@ def incoming_received(client, m):
                                 urls.append(url)
                                 save_data("./links.json", links)
             for item in urls:
+                print('item is: ',item)
                 joining(item)
         if chat_id == int(sudo):
             if text.startswith('min '):
