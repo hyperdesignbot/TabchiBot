@@ -105,15 +105,14 @@ def incoming_received(client, m):
                         for v in r:
                             url = 'https://' + ''.join(v)
                             links = load_data("./links.json")
-                            print('url is:',url)
                             if url not in links:
-                                print('url not in links; ',url)
                                 links.append(url)
                                 urls.append(url)
                                 save_data("./links.json", links)
+            print('urls is: ', urls)
             for item in urls:
                 print('item is: ',item)
-                joining(item)
+                #joining(item)
         if chat_id == int(sudo):
             if text.startswith('min '):
                 _, min_gp_member = text.split(' ')
