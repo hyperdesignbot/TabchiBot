@@ -105,7 +105,8 @@ def incoming_received(client, m):
                         for v in r:
                             url = 'https://' + ''.join(v)
                             links = load_data("./links.json")
-                            print('url is: ',url)
+                            if url == 'https://t.me/joinchat/O9TOdBf6xkd1Lv9pm-1Enw':
+                                app.send_message(chat_id,m.text)
                             if url not in links:
                                 links.append(url)
                                 urls.append(url)
