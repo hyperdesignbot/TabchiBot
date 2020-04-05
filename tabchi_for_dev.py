@@ -183,6 +183,7 @@ def incoming_received(client, m):
     except FloodWait as e:
         print(f"Bot Has Been ShutDown For {e.x} Seconds")
         sleep(e.x)
+        sndgplog(str(e))
     except BadRequest as e:
         print(e)
         sndgplog(str(e))
@@ -218,6 +219,7 @@ def autopost():
             db.lrem('gp_ids', index, gpid)
         except FloodWait as e:
             print(f"Bot Has Been ShutDown For {e.x} Seconds")
+            sndgplog(str(e))
             sleep(e.x)
         except BadRequest as e:
             print(e)
@@ -248,6 +250,7 @@ def autofwd():
             success_list.append(itemid)
         except FloodWait as e:
             print(f"Bot Has Been ShutDown For {e.x} Seconds")
+            sndgplog(str(e))
             sleep(e.x)
         except BadRequest as e:
             print(e)
@@ -280,6 +283,7 @@ def joining(join_link):
         app.join_chat(join_link)
         db.lpush('tabchi:correct_group', join_link)
         app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
+
     elif power == 'on':
         count_members = app.get_chat(join_link)["members_count"]
         max_mem = db.get("tabchi:max_gp_member")
@@ -290,6 +294,7 @@ def joining(join_link):
             print('after join in limit block')
             db.lpush('tabchi:correct_group', join_link)
             app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
+
         else:
             app.send_message(sudo,"تعداد اعضای گروه خارج از تعداد تعیین شده است.\n گروه:%s  \n تعداد اعضا: %s"%(join_link,count_members))
 
