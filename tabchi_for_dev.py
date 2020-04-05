@@ -106,7 +106,6 @@ def incoming_received(client, m):
                             url = 'https://' + ''.join(v)
                             links = db.smembers("tabchi:links")
                             if url not in links:
-                                db.sadd("tabchi:links",url)
                                 urls.append(url)
 
             print('urls is: ', urls)
@@ -282,6 +281,7 @@ def joining(join_link):
         power = db.get("tabchi:power")
         if power == 'off':
             app.join_chat(join_link)
+            db.sadd("tabchi:links", join_link)
             db.lpush('tabchi:correct_group', join_link)
             app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
 
@@ -292,6 +292,7 @@ def joining(join_link):
             if int(min_mem) <= int(count_members) <= int(max_mem):
                 print("in limit block")
                 app.join_chat(join_link)
+                db.sadd("tabchi:links", join_link)
                 print('after join in limit block')
                 db.lpush('tabchi:correct_group', join_link)
                 app.send_message(sudo, "به گروه %s جوین شد و لینک گروه ثبت شد" % join_link)
